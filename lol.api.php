@@ -34,49 +34,49 @@ class LeagueOfLegends{
 
 	public function getSummonerByName($Name){
 	/*	Get summoner objects mapped by standardized summoner name for a given list of summoner names	*/
-		return $this->RequestData('summoner/by-name/'.(is_array($Name)?implode(',',$Name):$Name),'1.4');
+		return $this->getData($this->getDataUrl('summoner/by-name/'.(is_array($Name)?implode(',',$Name):$Name),'1.4'));
 	}
 
 	public function getSummoner($SummonerID,$page=''){
 	/*	Get summoner objects mapped by summoner ID for a given list of summoner IDs
 		(string)		$page		=['','masteries','runes','name']
 	*/
-		return $this->RequestData('summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID).'/'.$page,'1.4');
+		return $this->getData($this->getDataUrl('summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID).'/'.$page,'1.4'));
 	}
 
 	public function getSummonerStats($SummonerID,$isRanked=false,$season=false){
 	/*	Get player stats by summoner ID	*/
-		return $this->RequestData('stats/by-summoner/'.$SummonerID.'/'.($isRanked?'ranked':'summary'),'1.3',$season?array('season'=>$season):array());
+		return $this->getData($this->getDataUrl('stats/by-summoner/'.$SummonerID.'/'.($isRanked?'ranked':'summary'),'1.3',$season?array('season'=>$season):array()));
 	}
 
 	public function getTeams($SummonerID){
 	/*	Get teams mapped by summoner ID for a given list of summoner IDs	*/
-		return $this->RequestData('team/by-summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID),'2.4');
+		return $this->getData($this->getDataUrl('team/by-summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID),'2.4'));
 	}
 
 	public function getTeamInfo($TeamID){
 	/*	Get teams mapped by team ID for a given list of team IDs	*/
-		return $this->RequestData('team/'.(is_array($TeamID)?implode(',',$TeamID):$TeamID),'2.4');
+		return $this->getData($this->getDataUrl('team/'.(is_array($TeamID)?implode(',',$TeamID):$TeamID),'2.4'));
 	}
 
 	public function getLeagues($SummonerID,$entry=false){
 	/*	Get leagues mapped by Summoner ID for a given list of IDs	*/
-		return $this->RequestData('league/by-summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID).'/'.($entry?'entry':''),'2.5');
+		return $this->getData($this->getDataUrl('league/by-summoner/'.(is_array($SummonerID)?implode(',',$SummonerID):$SummonerID).'/'.($entry?'entry':''),'2.5'));
 	}
 
 	public function getLeaguesByTeam($TeamID,$entry=false){
 	/*	Get leagues mapped by team ID for a given list of IDs	*/
-		return $this->RequestData('league/by-team/'.(is_array($TeamID)?implode(',',$TeamID):$TeamID).'/'.($entry?'entry':''),'2.5');
+		return $this->getData($this->getDataUrl('league/by-team/'.(is_array($TeamID)?implode(',',$TeamID):$TeamID).'/'.($entry?'entry':''),'2.5'));
 	}
 
 	public function getChallengerLeague($params=array('type'=>'RANKED_SOLO_5x5')){
 	/*	Get challenger tier leagues	*/
-		return $this->RequestData('league/challenger/','2.5',$params);
+		return $this->getData($this->getDataUrl('league/challenger/','2.5',$params));
 	}
 
 	public function getRecentGames($SummonerID) {
 	/*	Get recent games by summoner ID	*/
-		return $this->RequestData('game/by-summoner/'.$SummonerID.'/recent','1.3');
+		return $this->getData($this->getDataUrl('game/by-summoner/'.$SummonerID.'/recent','1.3'));
 	}
 
 	public function getMatchHistory($SummonerID,$params=array()) {
@@ -88,24 +88,24 @@ class LeagueOfLegends{
 							'endIndex'
 						]
 	*/
-		return $this->RequestData('matchhistory/'.$SummonerID,'2.2',$params);
+		return $this->getData($this->getDataUrl('matchhistory/'.$SummonerID,'2.2',$params));
 	}
 
 	public function getMatch($MatchID,$Timeline=false) {
 	/*	Retrieve match by match ID	*/
-		return $this->RequestData('matchhistory/'.$MatchID,'2.2',$Timeline?array('includeTimeline'=>1):array());
+		return $this->getData($this->getDataUrl('matchhistory/'.$MatchID,'2.2',$Timeline?array('includeTimeline'=>1):array()));
 	}
 
 	public function getCurrentGame($id){
 	/*	Get current game information for the given summoner ID
 		No idea about platform ids ( https://developer.riotgames.com/docs/spectating-games )
 	*/
-		return $this->RequestObserver('consumer/getSpectatorGameInfo/'.$this->platforms[$this->region].'/'.$id,array());
+		return $this->getData($this->getObserverUrl('consumer/getSpectatorGameInfo/'.$this->platforms[$this->region].'/'.$id,array()));
 	}
 
 	public function getFeaturedGames(){
 	/*	Get list of featured games	*/
-		return $this->RequestObserver('featured');
+		return $this->getData($this->getObserverUrl('featured'));
 	}
 
 
@@ -113,33 +113,33 @@ class LeagueOfLegends{
 
 	public function getChampionData($ChampionID=''){
 	/*	Retrieve (all champions /a champion by id) Data	*/
-		return $this->RequestData('champion/'.$ChampionID,'1.2');
+		return $this->getData($this->getDataUrl('champion/'.$ChampionID,'1.2'));
 	}
 
-	public function getShards($Region=''){
+	public function getShards($Region=false){
 	/*	Get shard status. Returns the data available on the status.leagueoflegends.com website for the given region	*/
-		return $this->RequestShards($Region);
+		return $this->getData($this->getShardsUrl($Region));
 	}
 
 
 	public function getStaticData($page,$params=array()){
 	/*	Retrieves Static data	*/
-		return $this->RequestStatic($page,'1.2',$params);
+		return $this->getData($this->getStaticUrl($page,'1.2',$params));
 	}
 
 
 
-	public function RequestShards($data){
-		return $this->getData('http://status.leagueoflegends.com/shards/'.$data);
+	public function getShardsUrl($data=false){
+		return 'http://status.leagueoflegends.com/shards'.($data?'/'.$data:'');
 	}
-	public function RequestStatic($data,$version,$params=array()){
-		return $this->getData('https://global.api.pvp.net/api/lol/static-data/'.$this->region.'/v'.$version.'/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params)));
+	public function getStaticUrl($data,$version,$params=array()){
+		return 'https://global.api.pvp.net/api/lol/static-data/'.$this->region.'/v'.$version.'/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params));
 	}
-	public function RequestObserver($data,$params=array()){
-		return $this->getData('https://'.$this->region.'.api.pvp.net/observer-mode/rest/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params)));
+	public function getObserverUrl($data,$params=array()){
+		return 'https://'.$this->region.'.api.pvp.net/observer-mode/rest/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params));
 	}
-	public function RequestData($data,$version,$params=array()){
-		return $this->getData('https://'.$this->region.'.api.pvp.net/api/lol/'.$this->region.'/v'.$version.'/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params)));
+	public function getDataUrl($data,$version,$params=array()){
+		return 'https://'.$this->region.'.api.pvp.net/api/lol/'.$this->region.'/v'.$version.'/'.$data.'?'.http_build_query(array_merge(array('api_key'=>$this->api_key),$params));
 	}
 
 	public function getData($url){
@@ -151,6 +151,14 @@ class LeagueOfLegends{
 		curl_close($ch);
 		
 		return $this->returnJSON?$r:json_decode($r);
+	}
+
+	public function gotResponse($r){
+		return !$r || !empty($r->status) && $r->status!="200"?false:true;
+	}
+	
+	static function parseSummonerName($name){
+		return htmlspecialchars(mb_strtolower(str_replace(" ", "",$name), 'UTF-8'));
 	}
 }
 ?>
